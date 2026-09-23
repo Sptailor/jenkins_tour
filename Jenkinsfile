@@ -2,31 +2,37 @@ pipeline {
     agent any
 
     stages {
+        stage('Build') {
+            steps {
+                echo 'Building'
+            }
+        }
         stage('Test') {
             steps {
-                sh 'echo "Fail!"; exit 1'
+                echo 'Testing'
+            }
+        }
+        stage('Deploy - Staging') {
+            steps {
+                echo 'Deploying to staging'
+                echo 'Running smoke tests'
+            }
+        }
+        stage('Sanity check') {
+            steps {
+                input "Does the staging environment look ok?"
+            }
+        }
+        stage('Deploy - Production') {
+            steps {
+                echo 'Deploying to production'
             }
         }
     }
 
     post {
         always {
-            echo 'This will always run'
-            deleteDir() /* clean up our workspace */
-        }
-        success {
-            echo 'This will run only if successful'
-        }
-        failure {
-            echo 'This will run only if failed'
-            echo "NOTIFY: ${currentBuild.fullDisplayName} failed - ${env.BUILD_URL}"
-        }
-        unstable {
-            echo 'This will run only if the run was marked as unstable'
-        }
-        changed {
-            echo 'This will run only if the state of the Pipeline has changed'
-            echo 'For example, if the Pipeline was previously failing but is now successful'
+            echo 'Pipeline finished'
         }
     }
 }
