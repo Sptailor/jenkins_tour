@@ -1,23 +1,11 @@
 pipeline {
-    agent any
+    agent {
+        docker { image 'node:22-alpine' }
+    }
     stages {
-        stage('build') {
+        stage('Test') {
             steps {
-                sh 'echo "Hello World"'
-                sh '''
-                    echo "Multiline shell steps works too"
-                    ls -lah
-                '''
-            }
-        }
-        stage('deploy') {
-            steps {
-                retry(3) {
-                    sh 'echo "Deploying (retry up to 3 times)"'
-                }
-                timeout(time: 3, unit: 'MINUTES') {
-                    sh 'echo "Health check (fails if over 3 minutes)"'
-                }
+                sh 'node --version'
             }
         }
     }
