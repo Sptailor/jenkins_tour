@@ -2,33 +2,31 @@ pipeline {
     agent any
 
     stages {
-        stage('Build') {
-            steps {
-                sh '''
-                    mkdir -p build/libs
-                    echo "fake build output" > build/libs/app.jar
-                '''
-            }
-        }
         stage('Test') {
             steps {
-                sh '''
-                    mkdir -p build/reports
-                    cat > build/reports/test-results.xml <<'EOF'
-<testsuite name="SampleTests" tests="2" failures="0" errors="0" skipped="0">
-  <testcase classname="SampleTests" name="testAddition" time="0.01"/>
-  <testcase classname="SampleTests" name="testSubtraction" time="0.01"/>
-</testsuite>
-EOF
-                '''
+                sh 'echo "Fail!"; exit 1'
             }
         }
     }
 
     post {
         always {
-            junit 'build/reports/**/*.xml'
-            archiveArtifacts artifacts: 'build/libs/**/*.jar', fingerprint: true
+            echo 'This will always run'
+            deleteDir() /* clean up our workspace */
+        }
+        success {
+            echo 'This will run only if successful'
+        }
+        failure {
+            echo 'This will run only if failed'
+            echo "NOTIFY: ${currentBuild.fullDisplayName} failed - ${env.BUILD_URL}"
+        }
+        unstable {
+            echo 'This will run only if the run was marked as unstable'
+        }
+        changed {
+            echo 'This will run only if the state of the Pipeline has changed'
+            echo 'For example, if the Pipeline was previously failing but is now successful'
         }
     }
 }
